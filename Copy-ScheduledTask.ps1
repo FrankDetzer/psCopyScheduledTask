@@ -9,7 +9,6 @@
             'State'          = $Task.State
             'URI'            = $Task.URI
             'Copy'           = $false
-            'CopyTargetPath' = $Task.TaskPath
         }
     }
 }
@@ -36,7 +35,9 @@ function Copy-ScheduledTask {
     $UserSelectedPath = Read-Host '[Q 2/3] If you want to copy the tasks to another folder please enter the targetfolder, if not just leave the field emnty.'
     if ($UserSelectedPath) {
         foreach ($Task in $script:Tasks) {
-            $Task.CopyTargetPath = $UserSelectedPath
+            $script:DestinationPath = $UserSelectedPath
+        }else {
+            $script:DestinationPath = ####
         }
     }
 
@@ -62,30 +63,24 @@ function Copy-ScheduledTaskFolder {
 
 function Use-ScheduledTaskEngine {
     $CopyCounter = 5
-    $IterateCounter = 0
+
+    foreach ($TaskToCopy in ($script:Tasks | Where-Object Copy -eq $true)) {
+
+        0..$CopyCounter | ForEach-Object {
+            if ($_ -eq 0) {
+                $TaskName = $TaskToCopy.Name + ' - copy'
+            }
+            else {
+                $TaskName = $TaskToCopy.Name + ' - copy ' + $_
+            }
 
 
-    $script:Tasks | ? Copy -eq $true | Group-Object Name | ForEach-Object {
-
-        $CurrentTaskName = $_.Name
-        if ($CurrentTaskName -ne $LastTaskName) {
-            $IterateCounter = 0
+            try {
+                Register-ScheduledTask -TaskName $TaskName -TaskPath $TaskToCopy.CopyTargetPath -Xml (Export-ScheduledTask $TaskToCopy.URI) -ErrorAction Stop
+            }
+            catch {
+                Write-Error ('You need elevated privileges to copy the task: ' + $TaskName + '. Please re-start the powershell with a admin user or the user account that created/owns the task.')
+            }
         }
-
-        if ($IterateCounter -eq 0) {
-            $TaskName = $_.Name + ' - copy'
-        }
-        else {
-            $TaskName = $_.Name + ' - copy ' + $IterateCounter
-        }
-
-        try {
-            Register-ScheduledTask -TaskName $TaskName -TaskPath $_.Group.CopyTargetPath -Xml (Export-ScheduledTask $_.URI) -ErrorAction Stop
-        }
-        catch {
-            Write-Error ('You need elevated privileges to copy the task: ' + $TaskName + '. Please re-start the powershell with a admin user or the user account that created/owns the task.')
-        }
-        $IterateCounter++
-        $LastTaskName = $_.Name
     }
 }
