@@ -1,4 +1,4 @@
-﻿function Build-ScheduledTaskList {
+﻿function Get-ScheduledTaskList {
     $script:Tasks = @()
     $ID = 1
     foreach ($Task in (Get-ScheduledTask)) {
@@ -14,7 +14,7 @@
 }
 
 function Copy-ScheduledTask {
-    Build-ScheduledTaskList
+    Get-ScheduledTaskList
     $script:Tasks | Select-Object -ExcludeProperty Copy, CopyTargetPath, URI | Format-Table -AutoSize
 
     # ID selection
@@ -37,23 +37,14 @@ function Copy-ScheduledTask {
         foreach ($Task in $script:Tasks) {
             $script:DestinationPath = $UserSelectedPath
         }else {
-            $script:DestinationPath = ####
+            $script:DestinationPath = 
         }
     }
-
-    # copy selecttion
-
-    # $UserCopyCounter = Read-Host '[Q 3/3] How many copies do you want to create of each task?'
-    
-
-
-
-
     Use-ScheduledTaskEngine 
 }
 
 function Copy-ScheduledTaskFolder {
-    Build-ScheduledTaskList
+    Get-ScheduledTaskList
     $script:Tasks | Group-Object Path | Select-Object -ExcludeProperty Copy, CopyTargetPath, URI | Format-Table -AutoSize
 
     if (Read-Host 'Do you want to open the legacy task scheduler? Power Shell cannot delete folders only  tasks') {
@@ -74,6 +65,9 @@ function Use-ScheduledTaskEngine {
                 $TaskName = $TaskToCopy.Name + ' - copy ' + $_
             }
 
+            if ($TaskName -eq (Get-ScheduledTask $TaskName).TaskName){
+                $TaskName = $TaskToCopy.Name + ' - copy ' + (New-Guid).Guid
+            }
 
             try {
                 Register-ScheduledTask -TaskName $TaskName -TaskPath $TaskToCopy.CopyTargetPath -Xml (Export-ScheduledTask $TaskToCopy.URI) -ErrorAction Stop
