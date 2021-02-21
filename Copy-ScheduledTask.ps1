@@ -7,11 +7,13 @@
         [switch]$DeleteSourceTask = $false
     )
 
-    begin {}
+    begin {
+        [int]$CopyNumber = 1
+    }
 
     process {
         foreach ($TaskToCopy in $URI) {
-            foreach ($CopyNumber in $NumberOfCopies) {
+            do {
                 if ($CopyNumber -eq 1) {
                     $TaskName = $TaskName + ' - copy'
                 }
@@ -29,8 +31,11 @@
             }
             catch {
                 Write-Error ('You need elevated privileges to copy the task: ' + $TaskName + '. Please re-start the powershell with a admin user or the user account that created/owns the task.')
-            }        
-        }
+            }       
+            $NumberOfCopies 
+            $CopyNumber
+            $CopyNumber++
+        }until ($CopyNumber -eq $NumberOfCopies)
     }
 
     }
