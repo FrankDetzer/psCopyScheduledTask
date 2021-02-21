@@ -1,9 +1,19 @@
-﻿function Get-ScheduledTaskList {
-    $script:ScheduledTaskList = @()
-    $ID = 1
+﻿
+function Copy-ScheduledTask {
+    param (
+        [string]$SourceURI = 'UndefinedURI',
+        [string]$SourceFolder = 'UndefinedFolder',
+        [string]$NewTaskName = 'UndefinedNewTaskName',
+        [string]$Destination = 'UndefinedDestination',
+        [int]$NumberOfCopies = 1,
+        [switch]$DeleteSourceTask = $false
+    )
+
+    $ScheduledTaskList = @()
     foreach ($Task in (Get-ScheduledTask)) {
-        $script:ScheduledTaskList += [PSCustomObject]@{
-            'ID'    = $ID++
+        $ScheduledTaskList += [PSCustomObject]@{
+
+            
             'Name'  = $Task.TaskName
             'Path'  = $Task.TaskPath
             'State' = $Task.State
@@ -11,19 +21,7 @@
             'Copy'  = $false
         }
     }
-    $script:ScheduledTaskList | Select-Object -ExcludeProperty URI, Copy
-}
 
-function Copy-ScheduledTask {
-    param (
-        [string]$SourceTask = 'UndefinedTaskName',
-        [string]$SourceFolder = 'UndefinedFolder',
-        [string]$TaskID = 'UndefinedID',
-        [string]$NewName = 'UndefinedNewName',
-        [string]$Destination = 'UndefinedDestination',
-        [int]$NumberOfCopies = 1,
-        [switch]$DeleteSourceTask = $false
-    )
 
     0..$NumberOfCopies | ForEach-Object {
         if ($_ -eq 0) {
