@@ -15,7 +15,7 @@
 
         foreach ($TaskToCopy in $URI) {
             $TaskName = $TaskToCopy.Split('\')[-1]
-            $TaskPath = $TaskToCopy.SubString(0,($URI.Length - $TaskToCopy.Length))
+            $TaskPath = $TaskToCopy.SubString(0,($TaskToCopy.LastIndexOf('\'))) + '\'
     
 
             if (!($Destination)){
