@@ -1,45 +1,39 @@
-﻿
-function Copy-ScheduledTask {
+﻿function Copy-ScheduledTask {
     param (
-        [string]$SourceURI = 'UndefinedURI',
-        [string]$SourceFolder = 'UndefinedFolder',
-        [string]$NewTaskName = 'UndefinedNewTaskName',
-        [string]$Destination = 'UndefinedDestination',
+        [parameter(ValueFromPipelineByPropertyName, ParameterSetName = 'URI', Position = 0)][string]$URI,
+        [parameter(ValueFromPipelineByPropertyName, DontShow)][string]$TaskName,
+        [parameter(ValueFromPipelineByPropertyName, DontShow)][string]$TaskPath,
         [int]$NumberOfCopies = 1,
         [switch]$DeleteSourceTask = $false
     )
 
-    $ScheduledTaskList = @()
-    foreach ($Task in (Get-ScheduledTask)) {
-        $ScheduledTaskList += [PSCustomObject]@{
+    begin {}
 
+    process {
+        foreach ($TaskToCopy in $URI) {
+            foreach ($CopyNumber in $NumberOfCopies) {
+                if ($CopyNumber -eq 1) {
+                    $TaskName = $TaskName + ' - copy'
+                }
+                else {
+                    $TaskName = $TaskName + ' - copy ' + $CopyNumber
+                }
             
-            'Name'  = $Task.TaskName
-            'Path'  = $Task.TaskPath
-            'State' = $Task.State
-            'URI'   = $Task.URI
-            'Copy'  = $false
+                # if ($TaskName -eq (Get-ScheduledTask $TaskName).TaskName) {
+                #     $TaskName = $URI.Split("\")[2] + ' - copy ' + (New-Guid).Guid
+                # }
+            
+            
+            try {
+                Register-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath -Xml (Export-ScheduledTask $URI) -ErrorAction Stop
+            }
+            catch {
+                Write-Error ('You need elevated privileges to copy the task: ' + $TaskName + '. Please re-start the powershell with a admin user or the user account that created/owns the task.')
+            }        
         }
     }
 
-
-    0..$NumberOfCopies | ForEach-Object {
-        if ($_ -eq 0) {
-            $TaskName = $TaskToCopy.Name + ' - copy'
-        }
-        else {
-            $TaskName = $TaskToCopy.Name + ' - copy ' + $_
-        }
-
-        if ($TaskName -eq (Get-ScheduledTask $TaskName).TaskName) {
-            $TaskName = $TaskToCopy.Name + ' - copy ' + (New-Guid).Guid
-        }
-
-        try {
-            Register-ScheduledTask -TaskName $TaskName -TaskPath $TaskToCopy.CopyTargetPath -Xml (Export-ScheduledTask $TaskToCopy.URI) -ErrorAction Stop
-        }
-        catch {
-            Write-Error ('You need elevated privileges to copy the task: ' + $TaskName + '. Please re-start the powershell with a admin user or the user account that created/owns the task.')
-        }
     }
+
+    end {}
 }
