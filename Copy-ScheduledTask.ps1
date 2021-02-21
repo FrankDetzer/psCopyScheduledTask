@@ -1,8 +1,8 @@
 ﻿function Copy-ScheduledTask {
     param (
         [parameter(ValueFromPipelineByPropertyName, ParameterSetName = 'URI', Position = 0)][string]$URI,
-        [parameter(ValueFromPipelineByPropertyName, DontShow)][string]$TaskName,
-        [parameter(ValueFromPipelineByPropertyName, DontShow)][string]$TaskPath,
+        # [parameter(ValueFromPipelineByPropertyName, DontShow)][string]$TaskName,
+        # [parameter(ValueFromPipelineByPropertyName, DontShow)][string]$TaskPath,
         [string]$Destination,
         [int]$NumberOfCopies = 1,
         [switch]$DeleteSourceTask = $false
@@ -11,11 +11,18 @@
     begin {}
 
     process {
-        if (!($Destination)){
-            $Destination = $TaskPath
-        }
         [int]$CopyNumber = 1
+
         foreach ($TaskToCopy in $URI) {
+            $TaskName = $TaskToCopy.Split('\')[-1]
+            $TaskPath = $TaskToCopy.SubString(0,($URI.Length - $TaskToCopy.Length))
+    
+
+            if (!($Destination)){
+                $Destination = $TaskPath
+            }
+    
+
             do {
                 if ($CopyNumber -eq 1) {
                     $CopyTaskName = $TaskName + ' - copy'
