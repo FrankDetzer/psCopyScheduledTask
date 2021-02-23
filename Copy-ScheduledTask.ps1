@@ -2,7 +2,9 @@
     param (
         [parameter(ValueFromPipelineByPropertyName, ParameterSetName = 'URI', Position = 0)][string]$URI,
         [string]$Destination,
-        [int]$NumberOfCopies = 1,
+        [string]$NameOfCopy,
+        [int]$Copies = 1,
+        [switch]$DisableCopy = $false,
         [switch]$DeleteSourceTask = $false
     )
 
@@ -12,24 +14,57 @@
         [int]$CopyNumber = 1
 
         foreach ($TaskToCopy in $URI) {
-            $TaskName = $TaskToCopy.Split('\')[-1]
+
+            if ($NameOfCopy) {
+                $TaskName = $NameOfCopy
+            }
+            else {
+                $TaskName = $TaskToCopy.Split('\')[-1]
+            }
     
             if ($Destination) {
                 $TaskPath = $Destination
-            }else {
-                $TaskPath = $TaskToCopy.SubString(0,($TaskToCopy.LastIndexOf('\') +1))
             }
-    
+            else {
+                $TaskPath = $TaskToCopy.SubString(0, ($TaskToCopy.LastIndexOf('\') + 1))
+            }
 
             do {
-                if ($CopyNumber -eq 1 -and ($Destination)) {
-                    $CopyTaskName = $TaskName 
+                if ($Destination) {
+                    if ($CopyNumber -eq 1) {
+                        $CopyTaskName = $TaskName
+                    }
+                    else {
+                        if (($CopyNumber - 1) -eq 1) {
+                            $CopyTaskName = $TaskName + ' - copy'
+                        }
+                        else {
+                            $CopyTaskName = $TaskName + ' - copy ' + ($CopyNumber - 1)
+                        } 
+                    }
                 }
-                elseif ($CopyNumber -eq 1) {
-                    $CopyTaskName = $TaskName + ' - copy'
+
+                if ($NameOfCopy) {
+                    if ($CopyNumber -eq 1) {
+                        $CopyTaskName = $TaskName
+                    }
+                    else {
+                        if (($CopyNumber - 1) -eq 1) {
+                            $CopyTaskName = $TaskName + ' - copy'
+                        }
+                        else {
+                            $CopyTaskName = $TaskName + ' - copy ' + ($CopyNumber - 1)
+                        } 
+                    }
                 }
+
                 else {
-                    $CopyTaskName = $TaskName + ' - copy ' + $CopyNumber
+                    if ($CopyNumber -eq 1) {
+                        $CopyTaskName = $TaskName + ' - copy'
+                    }
+                    else {
+                        $CopyTaskName = $TaskName + ' - copy ' + $CopyNumber
+                    }    
                 }
             
                 if ((Get-ScheduledTask -TaskName $CopyTaskName -TaskPath $TaskPath -ErrorAction Ignore).TaskName) {
@@ -37,12 +72,18 @@
                 }
             
                 try {
-                    Register-ScheduledTask -TaskName $CopyTaskName -TaskPath $TaskPath -Xml (Export-ScheduledTask $URI) -ErrorAction Stop
+                    if ($DisableCopy) {
+                        Register-ScheduledTask -TaskName $CopyTaskName -TaskPath $TaskPath -Xml (Export-ScheduledTask $URI) -ErrorAction Stop | Disable-ScheduledTask
+                    }
+                    else {
+                        Register-ScheduledTask -TaskName $CopyTaskName -TaskPath $TaskPath -Xml (Export-ScheduledTask $URI) -ErrorAction Stop
+                    }
                 }
                 catch {
                     Write-Error ('You need elevated privileges to copy the task: ' + $TaskName + '. Please re-start the powershell with a admin user or the user account that created/owns the task.')
-                }       
-            }until ($CopyNumber++ -eq $NumberOfCopies)
+                }
+                
+            }until ($CopyNumber++ -eq $Copies)
         }
     }
 
