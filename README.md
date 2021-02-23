@@ -70,7 +70,7 @@ This command gets task definition objects from multiple task paths
 
 ## PARAMETERS
 
-### URI
+### -URI
 Defines the URI (full path including the name) of the source object. 
 
 ```yaml
