@@ -1,4 +1,12 @@
-﻿function Copy-ScheduledTask {
+﻿# Module Github Page:   https://github.com/FrankDetzer/psCopyScheduledTask
+# Module Release Page:  https://frankdetzer.com/release-of-copy-scheduledtask/
+# Module Version:       1.0.0
+# Module Date:          2021-02-23
+#
+# Author Website:       https://frankdetzer.com
+# Author Twitter:       https://twitter.com/frankdetzer
+
+function Copy-ScheduledTask {
     param (
         [parameter(ValueFromPipelineByPropertyName, ParameterSetName = 'URI', Position = 0)][string]$URI,
         [string]$Destination,
