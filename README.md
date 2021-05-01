@@ -168,7 +168,7 @@ Accept wildcard characters: False
 ## NOTES
 
 ## RELATED LINKS
-[Blogpost on frankdetzer.com](https://frankdetzer.com/release-of-copy-scheduledtask/)
+[Blogpost on frankdetzer.com](https://frankdetzer.com/project/pwshcopyscheduledtask)
 
 [Repository on Github](https://github.com/FrankDetzer/psCopyScheduledTask)
 
@@ -183,7 +183,7 @@ Accept wildcard characters: False
 
 [New-ScheduledTask](https://docs.microsoft.com/en-us/powershell/module/scheduledtasks/new-scheduledtask)
 
-[Register-ScheduledTask](.https://docs.microsoft.com/en-us/powershell/module/scheduledtasks/register-scheduledtask)
+[Register-ScheduledTask](https://docs.microsoft.com/en-us/powershell/module/scheduledtasks/register-scheduledtask)
 
 [Set-ScheduledTask](https://docs.microsoft.com/en-us/powershell/module/scheduledtasks/set-scheduledtask)
 
