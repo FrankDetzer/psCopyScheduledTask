@@ -1,10 +1,8 @@
-﻿# Module Github Page:   https://github.com/FrankDetzer/psCopyScheduledTask
-# Module Release Page:  https://frankdetzer.com/release-of-copy-scheduledtask/
-# Module Version:       1.0.0
-# Module Date:          2021-02-23
-#
-# Author Website:       https://frankdetzer.com
-# Author Twitter:       https://twitter.com/frankdetzer
+﻿# Author:       FrankieDevOp
+# Date:         2021-06-23
+# Link:         https://github.com/FrankieDevOp/Copy-ScheduledTask
+# Version:      1.0.1
+# Changelog:    see readme.md
 
 function Copy-ScheduledTask {
     param (

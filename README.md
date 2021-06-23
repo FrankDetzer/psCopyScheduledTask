@@ -168,9 +168,7 @@ Accept wildcard characters: False
 ## NOTES
 
 ## RELATED LINKS
-[Blogpost on frankdetzer.com](https://frankdetzer.com/project/pwshcopyscheduledtask)
-
-[Repository on Github](https://github.com/FrankDetzer/psCopyScheduledTask)
+[Repository on Github](https://github.com/FrankieDevOp/Copy-ScheduledTask)
 
 ## RELATED MICROSOFT LINKS
 [Get-ScheduledTask](https://docs.microsoft.com/en-us/powershell/module/scheduledtasks/get-scheduledtask)
